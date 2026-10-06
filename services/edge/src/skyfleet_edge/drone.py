@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 
 from skyfleet_contracts import DroneStatus, Envelope, TelemetryV1
@@ -68,6 +69,7 @@ class VirtualDrone:
             self.altitude_m = 0.0
             self.target = None
 
+
     def to_telemetry(self) -> Envelope[TelemetryV1]:
         telemetry = TelemetryV1(
             drone_id=self.drone_id,
@@ -75,7 +77,7 @@ class VirtualDrone:
             longitude=self.longitude,
             altitude_m=self.altitude_m,
             speed_mps=self.speed_mps,
-            battery_pct=round(self.battery_pct),
+            battery_pct=math.floor(self.battery_pct),
             gps_satellites=self.gps_satellites,
             heading_deg=self.heading_deg,
             status=self.status,
