@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 members = [
     "skyfleet",
     "skyfleet-contracts",
+    "skyfleet-edge",
 ]
 
 [[package]]
@@ -199,6 +200,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "skyfleet-contracts" },
+    { name = "skyfleet-edge" },
 ]
 
 [package.dev-dependencies]
@@ -208,7 +210,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "skyfleet-contracts", editable = "contracts" }]
+requires-dist = [
+    { name = "skyfleet-contracts", editable = "contracts" },
+    { name = "skyfleet-edge", editable = "services/edge" },
+]
 
 [package.metadata.requires-dev]
 dev = [
@@ -226,6 +231,17 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [{ name = "pydantic", specifier = ">=2.7" }]
+
+[[package]]
+name = "skyfleet-edge"
+version = "0.1.0"
+source = { editable = "services/edge" }
+dependencies = [
+    { name = "skyfleet-contracts" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "skyfleet-contracts", editable = "contracts" }]
 
 [[package]]
 name = "typing-extensions"

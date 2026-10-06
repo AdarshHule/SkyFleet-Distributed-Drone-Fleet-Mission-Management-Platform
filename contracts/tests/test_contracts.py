@@ -3,6 +3,7 @@ from zoneinfo import ZoneInfo
 
 import pytest
 from pydantic import ValidationError
+
 from skyfleet_contracts import DroneStatus, Envelope, TelemetryV1
 
 
