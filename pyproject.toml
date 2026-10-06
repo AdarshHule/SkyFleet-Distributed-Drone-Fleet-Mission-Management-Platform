@@ -1,0 +1,14 @@
+[project]
+name = "skyfleet"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["skyfleet-contracts"]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[tool.uv.workspace]
+members = ["contracts"]
+
+[tool.uv.sources]
+skyfleet-contracts = { workspace = true }
