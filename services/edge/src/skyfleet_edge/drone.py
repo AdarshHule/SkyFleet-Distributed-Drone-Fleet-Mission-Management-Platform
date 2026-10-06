@@ -69,7 +69,6 @@ class VirtualDrone:
             self.altitude_m = 0.0
             self.target = None
 
-
     def to_telemetry(self) -> Envelope[TelemetryV1]:
         telemetry = TelemetryV1(
             drone_id=self.drone_id,

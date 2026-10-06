@@ -2,7 +2,10 @@
 name = "skyfleet-edge"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["skyfleet-contracts"]
+dependencies = [
+    "paho-mqtt>=2.1",
+    "skyfleet-contracts",
+]
 
 [tool.uv.sources]
 skyfleet-contracts = { workspace = true }
