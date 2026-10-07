@@ -19,7 +19,9 @@ def fake_telemetry(request: httpx.Request) -> httpx.Response:
 
 
 def client_with(handler) -> TestClient:
-    return TestClient(create_app(transport=httpx.MockTransport(handler)))
+    return TestClient(
+        create_app(transport=httpx.MockTransport(handler), start_mqtt=False)
+    )
 
 
 def test_list_drones_passes_through():

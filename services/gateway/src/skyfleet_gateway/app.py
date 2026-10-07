@@ -1,9 +1,20 @@
+import asyncio
 import os
 from contextlib import asynccontextmanager
 from typing import Annotated
 
 import httpx
-from fastapi import FastAPI, HTTPException, Path, Query, Request
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Path,
+    Query,
+    Request,
+    WebSocket,
+    WebSocketDisconnect,
+)
+
+from skyfleet_gateway.live import Hub, mqtt_listener
 
 TELEMETRY_URL = os.getenv("TELEMETRY_URL", "http://localhost:8001")
 TIMEOUT_S = 2.0
@@ -12,15 +23,21 @@ DRONE_ID_PATTERN = r"^SF-[A-Z]{2}-\d{3}$"
 DroneId = Annotated[str, Path(pattern=DRONE_ID_PATTERN)]
 
 
-def create_app(transport: httpx.AsyncBaseTransport | None = None) -> FastAPI:
-    """Build the app. Tests pass a fake transport; production passes nothing."""
+def create_app(
+    transport: httpx.AsyncBaseTransport | None = None, start_mqtt: bool = True
+) -> FastAPI:
+    """Build the app. Tests pass a fake transport and start_mqtt=False."""
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.telemetry = httpx.AsyncClient(
             base_url=TELEMETRY_URL, timeout=TIMEOUT_S, transport=transport
         )
+        app.state.hub = Hub()
+        task = asyncio.create_task(mqtt_listener(app.state.hub)) if start_mqtt else None
         yield
+        if task:
+            task.cancel()
         await app.state.telemetry.aclose()
 
     app = FastAPI(title="SkyFleet API Gateway", lifespan=lifespan)
@@ -80,6 +97,18 @@ def create_app(transport: httpx.AsyncBaseTransport | None = None) -> FastAPI:
         return await call_telemetry(
             request, f"/v1/drones/{drone_id}/history", params={"limit": limit}
         )
+
+    @app.websocket("/ws/telemetry")
+    async def ws_telemetry(ws: WebSocket):
+        hub: Hub = ws.app.state.hub
+        await hub.connect(ws)
+        try:
+            while True:
+                await (
+                    ws.receive_text()
+                )  # we don't expect messages; this detects disconnects
+        except WebSocketDisconnect:
+            hub.disconnect(ws)
 
     return app
 
