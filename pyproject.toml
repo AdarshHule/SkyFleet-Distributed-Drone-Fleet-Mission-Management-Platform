@@ -2,7 +2,7 @@
 name = "skyfleet"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["skyfleet-contracts", "skyfleet-edge", "skyfleet-telemetry"]
+dependencies = ["skyfleet-contracts", "skyfleet-edge", "skyfleet-telemetry", "skyfleet-gateway"]
 
 [dependency-groups]
 dev = [
@@ -12,12 +12,13 @@ dev = [
 ]
 
 [tool.uv.workspace]
-members = ["contracts", "services/edge", "services/telemetry"]
+members = ["contracts", "services/edge", "services/telemetry", "services/gateway"]
 
 [tool.uv.sources]
 skyfleet-contracts = { workspace = true }
 skyfleet-edge = { workspace = true }
 skyfleet-telemetry = { workspace = true }
+skyfleet-gateway = { workspace = true }
 
 [tool.ruff.lint.isort]
 known-first-party = ["skyfleet_contracts", "skyfleet_edge"]
