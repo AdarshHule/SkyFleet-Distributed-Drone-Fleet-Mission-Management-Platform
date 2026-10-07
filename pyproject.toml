@@ -2,17 +2,18 @@
 name = "skyfleet"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["skyfleet-contracts", "skyfleet-edge"]
+dependencies = ["skyfleet-contracts", "skyfleet-edge", "skyfleet-telemetry"]
 
 [dependency-groups]
 dev = ["pytest>=8", "ruff>=0.6"]
 
 [tool.uv.workspace]
-members = ["contracts", "services/edge"]
+members = ["contracts", "services/edge", "services/telemetry"]
 
 [tool.uv.sources]
 skyfleet-contracts = { workspace = true }
 skyfleet-edge = { workspace = true }
+skyfleet-telemetry = { workspace = true }
 
 [tool.ruff.lint.isort]
 known-first-party = ["skyfleet_contracts", "skyfleet_edge"]
