@@ -1,0 +1,8 @@
+.layout { display: flex; height: 100%; }
+.map { flex: 1; height: 100%; }
+.panel { width: 300px; padding: 16px; overflow-y: auto; border-left: 1px solid #ddd; background: #fafafa; color: #222; }
+.card { padding: 10px; margin-bottom: 10px; border-radius: 8px; background: #fff; border: 1px solid #e3e3e3; }
+.card.stale { opacity: 0.6; border-color: #e0a0a0; }
+.link-live { color: #0a7; }
+.link-connecting { color: #c80; }
+.link-offline { color: #c33; }
