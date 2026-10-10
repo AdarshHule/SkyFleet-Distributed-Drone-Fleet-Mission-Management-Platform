@@ -129,3 +129,14 @@ class CommandStore:
                 (new_state.value, ack.reason, ack.command_id),
             )
             return True
+
+    def due_for_send(self, limit: int = 100) -> list[dict]:
+        """The outbox: new commands, plus sent commands whose retry time has passed."""
+        return self.conn.execute(
+            """SELECT * FROM commands
+               WHERE state = 'PENDING'
+                  OR (state = 'SENT' AND next_attempt_at <= now())
+               ORDER BY created_at
+               LIMIT %s""",
+            (limit,),
+        ).fetchall()

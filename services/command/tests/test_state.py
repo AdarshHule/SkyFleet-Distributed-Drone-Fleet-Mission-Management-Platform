@@ -60,3 +60,7 @@ def test_terminal_states_never_change(terminal, event):
 def test_impossible_events_raise(state, event):
     with pytest.raises(InvalidTransition):
         apply(state, event)
+
+
+def test_command_can_expire_before_being_sent():
+    assert apply(S.PENDING, E.GAVE_UP) == (S.TIMED_OUT, True)

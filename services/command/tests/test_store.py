@@ -95,3 +95,13 @@ def test_cannot_resend_a_finished_command(store):
     cmd = sent_command(store)
     store.record_ack(ack(cmd["command_id"], "REJECTED"))
     assert store.mark_sent(cmd["command_id"], retry_after_s=5) is None
+
+
+def test_due_for_send_includes_new_and_overdue_commands(store):
+    new, _ = store.create(**LAND)
+    overdue, _ = store.create(**LAND)
+    waiting, _ = store.create(**LAND)
+    store.mark_sent(overdue["command_id"], retry_after_s=0)
+    store.mark_sent(waiting["command_id"], retry_after_s=60)
+    due = {row["command_id"] for row in store.due_for_send()}
+    assert due == {new["command_id"], overdue["command_id"]}

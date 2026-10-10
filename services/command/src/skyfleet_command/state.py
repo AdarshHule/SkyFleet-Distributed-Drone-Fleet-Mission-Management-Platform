@@ -47,6 +47,7 @@ TRANSITIONS: dict[tuple[CommandState, CommandEvent], CommandState] = {
     (S.SENT, E.FAILED): S.FAILED,
     (S.SENT, E.GAVE_UP): S.TIMED_OUT,
     (S.ACCEPTED, E.FAILED): S.FAILED,
+    (S.PENDING, E.GAVE_UP): S.TIMED_OUT,  # expired before it was ever sent
 }
 
 
