@@ -20,5 +20,9 @@ def commands_topic(site_id: str, drone_id: str) -> str:
     return _topic(site_id, drone_id, "commands")
 
 
+def command_acks_topic(site_id: str, drone_id: str) -> str:
+    return _topic(site_id, drone_id, "command_acks")
+
+
 def status_topic(site_id: str, drone_id: str) -> str:
     return _topic(site_id, drone_id, "status")

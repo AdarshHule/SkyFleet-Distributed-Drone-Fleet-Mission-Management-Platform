@@ -5,6 +5,7 @@ requires-python = ">=3.12"
 [manifest]
 members = [
     "skyfleet",
+    "skyfleet-command",
     "skyfleet-contracts",
     "skyfleet-edge",
     "skyfleet-gateway",
@@ -509,6 +510,7 @@ name = "skyfleet"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "skyfleet-command" },
     { name = "skyfleet-contracts" },
     { name = "skyfleet-edge" },
     { name = "skyfleet-gateway" },
@@ -524,6 +526,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "skyfleet-command", editable = "services/command" },
     { name = "skyfleet-contracts", editable = "contracts" },
     { name = "skyfleet-edge", editable = "services/edge" },
     { name = "skyfleet-gateway", editable = "services/gateway" },
@@ -536,6 +539,17 @@ dev = [
     { name = "pytest", specifier = ">=8" },
     { name = "ruff", specifier = ">=0.6" },
 ]
+
+[[package]]
+name = "skyfleet-command"
+version = "0.1.0"
+source = { editable = "services/command" }
+dependencies = [
+    { name = "skyfleet-contracts" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "skyfleet-contracts", editable = "contracts" }]
 
 [[package]]
 name = "skyfleet-contracts"

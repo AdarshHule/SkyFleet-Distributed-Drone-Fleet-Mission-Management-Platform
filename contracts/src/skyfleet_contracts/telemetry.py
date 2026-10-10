@@ -2,6 +2,8 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field
 
+DRONE_ID_PATTERN = r"^SF-[A-Z]{2}-\d{3}$"
+
 
 class DroneStatus(StrEnum):
     IDLE = "IDLE"
@@ -14,7 +16,7 @@ class DroneStatus(StrEnum):
 class TelemetryV1(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    drone_id: str = Field(pattern=r"^SF-[A-Z]{2}-\d{3}$")
+    drone_id: str = Field(pattern=DRONE_ID_PATTERN)
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
     altitude_m: float = Field(ge=0)
