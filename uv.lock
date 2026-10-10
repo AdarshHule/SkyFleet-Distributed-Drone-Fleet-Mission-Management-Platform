@@ -545,11 +545,15 @@ name = "skyfleet-command"
 version = "0.1.0"
 source = { editable = "services/command" }
 dependencies = [
+    { name = "psycopg", extra = ["binary"] },
     { name = "skyfleet-contracts" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "skyfleet-contracts", editable = "contracts" }]
+requires-dist = [
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.2" },
+    { name = "skyfleet-contracts", editable = "contracts" },
+]
 
 [[package]]
 name = "skyfleet-contracts"

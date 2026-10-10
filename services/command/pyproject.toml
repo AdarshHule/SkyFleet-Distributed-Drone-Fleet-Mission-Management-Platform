@@ -6,7 +6,10 @@ build-backend = "hatchling.build"
 name = "skyfleet-command"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["skyfleet-contracts"]
+dependencies = [
+    "psycopg[binary]>=3.2",
+    "skyfleet-contracts",
+]
 
 [tool.uv.sources]
 skyfleet-contracts = { workspace = true }
