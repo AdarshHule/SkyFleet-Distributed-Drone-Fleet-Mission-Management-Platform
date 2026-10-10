@@ -7,6 +7,8 @@ from skyfleet_edge import geo
 BATTERY_DRAIN_PCT_PER_S = 0.05  # only while flying
 ARRIVAL_RADIUS_M = 0.5
 
+AIRBORNE = frozenset({DroneStatus.FLYING, DroneStatus.RETURNING})
+
 
 @dataclass
 class VirtualDrone:
@@ -22,14 +24,32 @@ class VirtualDrone:
     target: tuple[float, float] | None = None
     cruise_speed_mps: float = 10.0
     cruise_altitude_m: float = 80.0
+    home: tuple[float, float] | None = None
+
+    def __post_init__(self) -> None:
+        if self.home is None:
+            self.home = (
+                self.latitude,
+                self.longitude,
+            )  # home = where the drone started
 
     def fly_to(self, lat: float, lon: float) -> None:
         self.target = (lat, lon)
         self.status = DroneStatus.FLYING
 
+    def return_home(self) -> None:
+        self.target = self.home
+        self.status = DroneStatus.RETURNING
+
+    def land(self) -> None:
+        self.status = DroneStatus.LANDED
+        self.speed_mps = 0.0
+        self.altitude_m = 0.0
+        self.target = None
+
     def step(self, dt: float) -> None:
         """Advance the simulation by dt seconds."""
-        if self.status != DroneStatus.FLYING or self.target is None:
+        if self.status not in AIRBORNE or self.target is None:
             self.speed_mps = 0.0
             return
 
