@@ -6,3 +6,16 @@
 .link-live { color: #0a7; }
 .link-connecting { color: #c80; }
 .link-offline { color: #c33; }
+.card { cursor: pointer; }
+.card.selected { border-color: #0a7; box-shadow: 0 0 0 1px #0a7; }
+.controls { margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd; }
+.controls h2 { font-size: 15px; margin: 0 0 8px; }
+.buttons { display: flex; gap: 8px; }
+.buttons button { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+.buttons button:disabled { opacity: 0.5; cursor: wait; }
+.hint { font-size: 13px; color: #666; }
+.badge { padding: 6px 10px; border-radius: 6px; font-weight: 600; background: #eee; }
+.badge-accepted, .badge-sent, .badge-pending { background: #fff3cd; }
+.badge-completed { background: #d4edda; }
+.badge-rejected, .badge-failed, .badge-timed_out { background: #f8d7da; }
+.error { color: #c33; }
