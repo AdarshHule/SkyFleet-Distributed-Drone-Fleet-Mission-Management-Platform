@@ -546,6 +546,7 @@ version = "0.1.0"
 source = { editable = "services/command" }
 dependencies = [
     { name = "fastapi" },
+    { name = "paho-mqtt" },
     { name = "psycopg", extra = ["binary"] },
     { name = "psycopg-pool" },
     { name = "skyfleet-contracts" },
@@ -555,6 +556,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115" },
+    { name = "paho-mqtt", specifier = ">=2.1" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2" },
     { name = "psycopg-pool", specifier = ">=3.2" },
     { name = "skyfleet-contracts", editable = "contracts" },
