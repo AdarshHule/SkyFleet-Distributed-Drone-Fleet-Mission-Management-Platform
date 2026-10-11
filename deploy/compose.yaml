@@ -1,10 +1,13 @@
+name: skyfleet
+
 services:
   mqtt:
     image: eclipse-mosquitto:2
     ports:
-      - "1883:1883"
+      - "1883:1883"   # dev only: for mosquitto_sub on your Mac
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    restart: unless-stopped
 
   postgres:
     image: postgres:17
@@ -13,14 +16,108 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "5432:5432"   # dev only: for pytest on your Mac
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+      - ../services/telemetry/sql/001_init.sql:/schemas/telemetry.sql:ro
+      - ../services/command/sql/001_init.sql:/schemas/command.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 3s
       retries: 10
+    restart: unless-stopped
+
+  telemetry-ingest:
+    build: { context: .., args: { PACKAGE: skyfleet-telemetry } }
+    image: skyfleet/telemetry
+    command: python -m skyfleet_telemetry.main
+    environment:
+      MQTT_HOST: mqtt
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/skyfleet
+    depends_on:
+      postgres: { condition: service_healthy }
+      mqtt: { condition: service_started }
+    stop_signal: SIGINT
+    restart: unless-stopped
+
+  telemetry-api:
+    build: { context: .., args: { PACKAGE: skyfleet-telemetry } }
+    image: skyfleet/telemetry
+    command: uvicorn skyfleet_telemetry.api:app --host 0.0.0.0 --port 8001
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/skyfleet
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  command-api:
+    build: { context: .., args: { PACKAGE: skyfleet-command } }
+    image: skyfleet/command
+    command: uvicorn skyfleet_command.api:app --host 0.0.0.0 --port 8002
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/skyfleet_command
+    depends_on:
+      postgres: { condition: service_healthy }
+    # TODO (you): add a healthcheck for port 8002, copying telemetry-api's
+    restart: unless-stopped
+
+  command-worker:
+    build: { context: .., args: { PACKAGE: skyfleet-command } }
+    image: skyfleet/command
+    command: python -m skyfleet_command.worker
+    environment:
+      MQTT_HOST: mqtt
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/skyfleet_command
+    depends_on:
+      postgres: { condition: service_healthy }
+      mqtt: { condition: service_started }
+    stop_signal: SIGINT
+    restart: unless-stopped
+
+  gateway:
+    build: { context: .., args: { PACKAGE: skyfleet-gateway } }
+    image: skyfleet/gateway
+    command: uvicorn skyfleet_gateway.app:app --host 0.0.0.0 --port 8000
+    environment:
+      MQTT_HOST: mqtt
+      TELEMETRY_URL: http://telemetry-api:8001
+      COMMAND_URL: http://command-api:8002
+    depends_on:
+      telemetry-api: { condition: service_healthy }
+      mqtt: { condition: service_started }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  drone:
+    build: { context: .., args: { PACKAGE: skyfleet-edge } }
+    image: skyfleet/edge
+    command: python -m skyfleet_edge.main
+    environment:
+      MQTT_HOST: mqtt
+    depends_on:
+      mqtt: { condition: service_started }
+    stop_signal: SIGINT
+    restart: unless-stopped
+
+  dashboard:
+    build: { context: ../dashboard }
+    image: skyfleet/dashboard
+    ports:
+      - "8080:80"   # the only front door
+    depends_on:
+      gateway: { condition: service_healthy }
+    restart: unless-stopped
 
 volumes:
   pgdata:
