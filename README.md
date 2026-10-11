@@ -113,6 +113,8 @@ Python 3.12 · FastAPI · Pydantic v2 · psycopg 3 · PostgreSQL 17 · MQTT (Mos
 
 **Requirements:** Docker, [uv](https://docs.astral.sh/uv/), Node.js.
 
+This manual setup will be replaced by a single `docker compose up` (in progress).
+
 ```bash
 # 1. Infrastructure
 cp deploy/.env.example deploy/.env
@@ -168,11 +170,15 @@ These are deliberate gaps, listed so they're visible rather than hidden:
 
 ## Roadmap
 
+**In progress:**
+- [ ] Dockerfiles for every service and single-command startup (`docker compose up`)
+- [ ] Deployment on AWS (EC2, images in ECR) with a public demo URL
+- [ ] GitHub Actions CI (tests on every push)
+
+**Planned:**
 - [ ] Fleet service (drones, sites) and Mission service (multi-waypoint missions)
 - [ ] Durable, bounded telemetry buffer on the edge; alert service (low battery, no signal)
-- [ ] Dockerfiles for every service and single-command startup
-- [ ] Kubernetes manifests (kind), GitHub Actions CI
-- [ ] Deployment on AWS (k3s on EC2, Terraform)
+- [ ] Kubernetes manifests (kind), infrastructure as code (Terraform)
 
 ---
 
