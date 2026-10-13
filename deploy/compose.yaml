@@ -31,7 +31,7 @@ services:
 
   telemetry-ingest:
     build: { context: .., args: { PACKAGE: skyfleet-telemetry } }
-    image: skyfleet/telemetry
+    image: ${IMAGE_PREFIX:-}skyfleet/telemetry
     command: python -m skyfleet_telemetry.main
     environment:
       MQTT_HOST: mqtt
@@ -44,7 +44,7 @@ services:
 
   telemetry-api:
     build: { context: .., args: { PACKAGE: skyfleet-telemetry } }
-    image: skyfleet/telemetry
+    image: ${IMAGE_PREFIX:-}skyfleet/telemetry
     command: uvicorn skyfleet_telemetry.api:app --host 0.0.0.0 --port 8001
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/skyfleet
@@ -59,7 +59,7 @@ services:
 
   command-api:
     build: { context: .., args: { PACKAGE: skyfleet-command } }
-    image: skyfleet/command
+    image: ${IMAGE_PREFIX:-}skyfleet/command
     command: uvicorn skyfleet_command.api:app --host 0.0.0.0 --port 8002
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/skyfleet_command
@@ -70,7 +70,7 @@ services:
 
   command-worker:
     build: { context: .., args: { PACKAGE: skyfleet-command } }
-    image: skyfleet/command
+    image: ${IMAGE_PREFIX:-}skyfleet/command
     command: python -m skyfleet_command.worker
     environment:
       MQTT_HOST: mqtt
@@ -83,7 +83,7 @@ services:
 
   gateway:
     build: { context: .., args: { PACKAGE: skyfleet-gateway } }
-    image: skyfleet/gateway
+    image: ${IMAGE_PREFIX:-}skyfleet/gateway
     command: uvicorn skyfleet_gateway.app:app --host 0.0.0.0 --port 8000
     environment:
       MQTT_HOST: mqtt
@@ -101,7 +101,7 @@ services:
 
   drone:
     build: { context: .., args: { PACKAGE: skyfleet-edge } }
-    image: skyfleet/edge
+    image: ${IMAGE_PREFIX:-}skyfleet/edge
     command: python -m skyfleet_edge.main
     environment:
       MQTT_HOST: mqtt
@@ -112,7 +112,7 @@ services:
 
   dashboard:
     build: { context: ../dashboard }
-    image: skyfleet/dashboard
+    image: ${IMAGE_PREFIX:-}skyfleet/dashboard
     ports:
       - "8080:80"   # the only front door
     depends_on:
