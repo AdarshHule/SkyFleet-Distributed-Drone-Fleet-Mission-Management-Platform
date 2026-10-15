@@ -1,0 +1,8 @@
+services:
+  mqtt:
+    ports: !reset []
+  postgres:
+    ports: !reset []
+  dashboard:
+    ports: !override
+      - "80:80"
